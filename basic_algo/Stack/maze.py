@@ -1,52 +1,40 @@
 T = int(input())
-for tc in range(1,T+1):
-    # N*N 미로
-    N = int(input())
-    maze = [list(map(int,input())) for _ in range(N)]
 
-    # 시작점 찾기
-    for i in range(N):
-        for j in range(N):
-            if maze[i][j] == 2:
-                r,c = i,j
-                break
-    # 이동경로
-    stack = []
-    # 방문확인
+# 상하좌우
+dr = [-1, 1, 0, 0]
+dc = [0, 0, -1, 1]
+
+def dfs(r, c, N):
     visited = [[0]*N for _ in range(N)]
-    # 시작점 표시
+
+    stack = []
+    # 시작점 push
     stack.append((r,c))
+    # visited 표시
     visited[r][c] = 1
-
-    # 상하좌우
-    dr = [-1, 1, 0, 0]
-    dc = [0, 0, -1, 1]
-
-    # 결과 : 도착하면 1, 아니면 0 (기본값 = 도착 못 함)
-    result = 0
-
-    # 스택이 비었다는 건 갈 수 있는 길이 없어 되돌아오면서 길을 탐색해도 길이 없음
+    # 탐색(while stack)
     while stack:
-        # 현재 위치
-        cr,cc = stack[-1]
-        # 위치 값이 3이면 도착
-        if maze[cr][cc] == 3:
-            result = 1
-            break
-
-        # 길을 따라 이동해보기
+        r, c = stack.pop()
+        if maze[r][c] == '3':
+            return 1
         for d in range(4):
-            nr = cr + dr[d]
-            nc = cc + dc[d]
-            # 갈 수 있는 길인지 확인
-            # 갈 수 없는 길 : 미로를 벗어나는 경우, 벽, 이미 방문한 곳
-            if 0 <= nr < N and 0 <= nc < N and maze[nr][nc] != 1 and visited[nr][nc] == 0:
-                # 갈 수 있는 길이니 이동해보기
-                stack.append((nr,nc))
-                visited[nr][nc] = 1
-                break
-        # break을 만나지 않았다는 것은 갈 길이 없다는 것 -> 한 칸 되돌아 가보자
-        else:
-            stack.pop()
+            wr, wc = r + dr[d], c +dc[d]
+            if 0 <= wr < N and 0<= wc < N and maze[wr][wc] != '1' and visited[wr][wc] == 0:
+                stack.append((wr, wc))
+                visited[wr][wc] = 1
+    return 0
 
-    print(f'#{tc} {result}')
+for test_case in range(1, T+1):
+    N = int(input())
+
+    maze = [list(input()) for _ in range(N)]
+
+    for r in range(N):
+        for c in range(N):
+            if maze[r][c] == '2':
+                sr, sc = r, c
+    
+    
+    ans = dfs(sr, sc, N)
+
+    print(f"#{test_case} {ans}")
