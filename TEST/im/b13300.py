@@ -22,9 +22,9 @@ for n in range(N):
 
 for i in range(7):
     if w_cnt[i] != 0:
-        ans += (w_cnt[i]//2 + 1)
+        ans += (w_cnt[i]//K + 1)
     if m_cnt[i] != 0:
-        ans += (m_cnt[i]//2 + 1)
+        ans += (m_cnt[i]//K + 1)
 
 print(ans)
     
