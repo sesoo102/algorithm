@@ -20,12 +20,16 @@ for n in range(N):
     elif S == 1:
         m_cnt[Y] += 1
 
-for i in range(7):
-    if w_cnt[i] != 0:
+    # print(w_cnt)
+    # print(m_cnt)
+for i in range(1, 7):
+    if w_cnt[i] != 0 and w_cnt[i] % K != 0:
         ans += (w_cnt[i]//K + 1)
-    if m_cnt[i] != 0:
+    elif w_cnt[i] != 0 and w_cnt[i] % K == 0:
+        ans += w_cnt[i]//K
+    if m_cnt[i] != 0 and m_cnt[i] % K != 0:
         ans += (m_cnt[i]//K + 1)
+    elif m_cnt[i] != 0 and m_cnt[i] % K == 0:
+        ans += m_cnt[i]//K
 
 print(ans)
-    
-
