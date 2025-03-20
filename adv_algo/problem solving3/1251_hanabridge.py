@@ -3,12 +3,28 @@
 환경 부담금 = E*L**2
 tree...
 """
+import heapq
+
 T = int(input())
 
 
-def dfs(r, c, cost):
+def find_parent(x):
+    if parent[x] != x:
+        parent[x] = find_parent(parent[x])
+    return parent[x]
 
-    pass
+
+def union(a, b):
+    a = find_parent(a)
+    b = find_parent(b)
+
+    if a == b:
+        return
+
+    if a < b:
+        parent[b] = a
+    else:
+        parent[a] = b
 
 
 for test_case in range(1, T + 1):
@@ -21,8 +37,26 @@ for test_case in range(1, T + 1):
     # E 환경 부담세율
     E = float(input())
 
-    min_cost = 9e99
-    dfs()
+    parent = [p for p in range(N)]
+    island = [(C[i], R[i]) for i in range(N)]
 
-    visited = [False] * (N + 1)
-    out = [0] * (N + 1)
+    edges = []
+
+    for i in range(N):
+        for j in range(i + 1, N):
+            d = (C[i] - C[j]) ** 2 + (R[i] - R[j]) ** 2
+            edges.append((d, i, j))
+    edges.sort()
+
+    cnt = 0
+    result = 0
+    for d, r, c in edges:
+        if find_parent(r) != find_parent(c):
+            cnt += 1
+            union(r, c)
+            result += d * E
+            if cnt == N - 1:
+                break
+
+    # 소수 첫째 자리에서 반올림하여 정수 형태로 출력
+    print(f"#{test_case} {round(result)}")
