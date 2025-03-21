@@ -1,56 +1,74 @@
-# 부모찾는 함수
-def Find(n):
-    # 부모가 자신이 아니라면
-    if parent[n] != n:
-        # 부모 찾기
-        parent[n] = Find(parent[n])
-    return parent[n]
-
-
-# 부모관계 설정하는 함수
-# 기본 값은 자기자신으로 되어있으므로 간선을 입력 받을 때마다 관계 설정하기
-def union(a, b):
-    # 부모 찾기
-    a = Find(a)
-    b = Find(b)
-    # 부모가 작은 쪽을 부모로 두고 값을 변경
-    if a < b:
-        parent[b] = a
-    else:
-        parent[a] = b
-
+import heapq
 
 T = int(input())
-for test_case in range(1, T + 1):
-    # V: 마지막 노드 번호, E: 간선의 개수
-    V, E = map(int, input().split())
-    # 간선 정보 리스트
-    relation = [0] * (E)
-    # 가중치를 기준으로 정렬해야 하므로 가중치를 첫번쨰로 입력한 간선 정보를 입력하기
-    for i in range(E):
-        # n1, n2: 양 끝 노드 번호 , w: 가중치
-        n1, n2, w = map(int, input().split())
-        relation[i] = [w, n1, n2]
-    relation.sort()
-    # 부모 테이블 생성 (기본 값은 자기자신)
-    parent = list(range(V + 1))
-    # 최소값
-    mn = 0
-    # 연결이 모두 끝났을 경우 멈추기 위한 cnt
-    # 간선 개수 - 1이라면 모두 연결된 것
-    cnt = 0
-    for i in range(E):
-        w, n1, n2 = relation[i]
-        # n1과 n2가 부모가 같은지 확인
-        # 다르다면 union함수로 n1과 n2를 연결해주기
-        if Find(n1) != Find(n2):
-            print(f"집합 {w}, {n1}, {n2}")
-            union(n1, n2)
-            # 가중치 더하기
-            mn += w
-            cnt += 1
-        # 모두 연결되었다면 break로 종료
-        if cnt >= V:
-            break
 
-    print(f"#{test_case} {mn}")
+
+def find_parent(x):
+    """경로 압축을 적용한 유니온-파인드"""
+    if parent[x] != x:
+        parent[x] = find_parent(parent[x])
+    return parent[x]
+
+
+def union(a, b):
+    """두 노드를 같은 집합으로 합치는 유니온 연산"""
+    root_a = find_parent(a)
+    root_b = find_parent(b)
+
+    if root_a != root_b:
+        parent[root_b] = root_a
+
+
+def kruskal():
+    """크루스칼 알고리즘을 이용한 최소 신장 트리 (MST) 계산"""
+    edges.sort()  # 비용을 기준으로 오름차순 정렬
+    mst_cost = 0
+    edge_count = 0
+
+    for cost, u, v in edges:
+        if find_parent(u) != find_parent(v):  # 사이클이 발생하지 않으면 추가
+            union(u, v)
+            mst_cost += cost
+            edge_count += 1
+
+            if edge_count == N - 1:  # MST 완성
+                break
+
+    return round(mst_cost)  # 최종 결과 반올림
+
+
+for test_case in range(1, T + 1):
+    # N 섬의 개수
+    N = int(input())
+    # 각 섬들의 정수인 x좌표
+    C = list(map(int, input().split()))
+    # 각 섬들의 정수인 y좌표
+    R = list(map(int, input().split()))
+    # E 환경 부담세율
+    E = float(input())
+
+    # 좌표 저장
+    islands = [(C[i], R[i]) for i in range(N)]
+
+    # 간선 정보 저장 (거리 기반)
+    edges = []
+
+    for i in range(N):
+        for j in range(i + 1, N):
+            x1, y1 = islands[i]
+            x2, y2 = islands[j]
+
+            # 유클리드 거리의 제곱을 사용하여 가중치 계산
+            distance = (x1 - x2) ** 2 + (y1 - y2) ** 2
+            cost = distance * E
+
+            # 간선 리스트에 추가 (비용, 노드1, 노드2)
+            edges.append((cost, i, j))
+
+    # 유니온-파인드 부모 배열 초기화
+    parent = [i for i in range(N)]
+
+    # MST 비용 계산
+    ans = kruskal()
+
+    print(f"#{test_case} {ans}")
